@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [
     { 
         "id": 1,
@@ -22,7 +24,7 @@ let persons = [
         "name": "Mary Poppendieck", 
         "number": "39-23-6423122"
     }
-  ]
+]
 
 
 app.get('/api/persons', (req, res) => {
@@ -50,6 +52,43 @@ app.delete('/api/persons/:id', (req, res) => {
     console.log(id)
     persons = persons.filter(person => person.id !== id)
     res.send(`Got a DELETE request at /person/${id}`)
+})
+
+const generateId = () => {
+    const max = 1000000
+    return Math.floor(Math.random() * max);
+}
+  
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    console.log(body)
+    
+    if (!body.name) {
+      return response.status(400).json({ 
+        error: 'name missing' 
+      })
+    }
+    if (persons.some(person => person.name === body.name)) {
+      return response.status(400).json({ 
+        error: 'name must be unique' 
+      })
+    }    
+    if (!body.number) {
+      return response.status(400).json({ 
+        error: 'number missing' 
+      })
+    }
+
+  
+    const person = {
+      id: generateId(),
+      name: body.name,
+      number: body.number
+    }
+  
+    persons = persons.concat(person)
+  
+    response.json(person)
 })
 
 const PORT = 3001
