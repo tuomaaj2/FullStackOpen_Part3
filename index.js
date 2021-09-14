@@ -1,7 +1,18 @@
 const express = require('express')
+var morgan = require('morgan')
+
+morgan.token('resp', function getData (req) {
+    if(req.method === 'POST'){
+        return JSON.stringify(req.body)
+    }
+    return " "
+  })
+
 const app = express()
 
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :resp'))
 
 let persons = [
     { 
@@ -51,7 +62,7 @@ app.delete('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id)
     console.log(id)
     persons = persons.filter(person => person.id !== id)
-    res.send(`Got a DELETE request at /person/${id}`)
+    response.status(204).end()
 })
 
 const generateId = () => {
