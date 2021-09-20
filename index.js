@@ -75,17 +75,17 @@ app.post('/api/persons', (req, res) => {
     const body = req.body
     
     if (!body.name) {
-      return response.status(400).json({ 
+      return res.status(400).json({ 
         error: 'name missing' 
       })
     }
     if (persons.some(person => person.name === body.name)) {
-      return response.status(400).json({ 
+      return res.status(400).json({ 
         error: 'name must be unique' 
       })
     }    
     if (!body.number) {
-      return response.status(400).json({ 
+      return res.status(400).json({ 
         error: 'number missing' 
       })
     }
@@ -97,7 +97,7 @@ app.post('/api/persons', (req, res) => {
     }
 
     persons = persons.concat(person)
-    response.json(person)
+    res.json(person)
 })
 
 const PORT = process.env.PORT || 3001
