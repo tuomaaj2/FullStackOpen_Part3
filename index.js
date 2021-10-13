@@ -18,6 +18,16 @@ app.use(express.json())
 app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :resp'))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  next(error)
+}
+
+
 let persons = [
     { 
         "id": 1,
@@ -53,23 +63,25 @@ app.get('/info', (req, res) => {
     res.write(new Date().toString())
 })
 
-app.get('/api/persons/:id', (req, res) => {
-  Persons.findById(req.params.id).then(person => {
-    res.json(person)
+app.get('/api/persons/:id', (req, res, next) => {
+  Persons.findById(req.params.id)
+  .then(person => {
+    if (person) {
+      res.json(person)
+    } else {
+      res.status(404).end()
+    }
   })
+  .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    console.log(id)
-    persons = persons.filter(person => person.id !== id)
+app.delete('/api/persons/:id', (req, res, next) => {
+  Persons.findByIdAndRemove(req.params.id)
+  .then(result => {
     res.status(204).end()
+  })
+  .catch(error => next(error))
 })
-
-const generateId = () => {
-    const max = 1000000
-    return Math.floor(Math.random() * max);
-}
   
 app.post('/api/persons', (req, res) => {
     const body = req.body
@@ -87,6 +99,8 @@ app.post('/api/persons', (req, res) => {
       res.json(savedPerson)
     })
 })
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
