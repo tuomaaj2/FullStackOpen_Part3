@@ -53,14 +53,16 @@ let persons = [
 
 
 app.get('/api/persons', (req, res) => {
-  Persons.find({}).then(number => {
-    res.json(number)
+  Persons.find({}).then(persons => {
+    res.json(persons)
   })
 })
 
 app.get('/info', (req, res) => {
+  Persons.find({}).then(persons => {
     res.write(`<p>Phonebook has info for ${persons.length} people</p>`)
     res.write(new Date().toString())
+  })
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -98,6 +100,21 @@ app.post('/api/persons', (req, res) => {
     person.save().then(savedPerson => {
       res.json(savedPerson)
     })
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Persons.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.use(errorHandler)
