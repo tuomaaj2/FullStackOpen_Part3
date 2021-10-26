@@ -5,7 +5,7 @@ const password = process.argv[2]
 const url =
   `mongodb+srv://fullstack:${password}@cluster0.5lfpo.mongodb.net/phoneBookDB?retryWrites=true&w=majority`
 
-mongoose.connect(url) 
+mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
   name: String,
@@ -14,7 +14,7 @@ const personSchema = new mongoose.Schema({
 
 const Number = mongoose.model('Number', personSchema)
 
-if (process.argv.length == 3) {
+if (process.argv.length === 3) {
   Number
     .find({})
     .then(result => {

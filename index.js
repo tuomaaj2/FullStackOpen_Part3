@@ -61,13 +61,12 @@ app.delete('/api/persons/:id', (req, res, next) => {
     })
     .catch(error => next(error))
 })
-  
+
 app.post('/api/persons', (req, res, next) => {
   const body = req.body
-    
   if (!body.name) {
-    return res.status(400).json({ 
-      error: 'name missing' 
+    return res.status(400).json({
+      error: 'name missing'
     })
   }
   const person = new Persons({
