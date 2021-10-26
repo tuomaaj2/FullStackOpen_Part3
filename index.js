@@ -5,11 +5,11 @@ const cors = require('cors')
 const Persons = require('./models/numbers')
 
 morgan.token('resp', function getData (req) {
-    if(req.method === 'POST'){
-        return JSON.stringify(req.body)
-    }
-    return " "
-  })
+  if(req.method === 'POST'){
+    return JSON.stringify(req.body)
+  }
+  return ' '
+})
 
 const app = express()
 
@@ -29,31 +29,6 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-
-let persons = [
-    { 
-        "id": 1,
-        "name": "Arto Hellas", 
-        "number": "040-123456"
-    },
-    { 
-        "id": 2,
-        "name": "Ada Lovelace", 
-        "number": "39-44-5323523"
-    },
-    {
-        "id": 3,
-        "name": "Dan Abramov", 
-        "number": "12-43-234345"
-    },
-    { 
-        "id": 4,
-        "name": "Mary Poppendieck", 
-        "number": "39-23-6423122"
-    }
-]
-
-
 app.get('/api/persons', (req, res) => {
   Persons.find({}).then(persons => {
     res.json(persons)
@@ -69,37 +44,38 @@ app.get('/info', (req, res) => {
 
 app.get('/api/persons/:id', (req, res, next) => {
   Persons.findById(req.params.id)
-  .then(person => {
-    if (person) {
-      res.json(person)
-    } else {
-      res.status(404).end()
-    }
-  })
-  .catch(error => next(error))
+    .then(person => {
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
   Persons.findByIdAndRemove(req.params.id)
-  .then(result => {
-    res.status(204).end()
-  })
-  .catch(error => next(error))
+    .then(() => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
   
 app.post('/api/persons', (req, res, next) => {
-    const body = req.body
+  const body = req.body
     
-    if (!body.name) {
-      return res.status(400).json({ 
-        error: 'name missing' 
-      })
-    }
-    const person = new Persons({
-      name: req.body.name,
-      number: req.body.number
+  if (!body.name) {
+    return res.status(400).json({ 
+      error: 'name missing' 
     })
-    person.save().then(savedPerson => {
+  }
+  const person = new Persons({
+    name: req.body.name,
+    number: req.body.number
+  })
+  person.save()
+    .then(savedPerson => {
       res.json(savedPerson)
     })
     .catch(error => next(error))
